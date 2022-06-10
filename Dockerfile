@@ -1,6 +1,9 @@
-FROM ros:melodic
+# Melodic includes OpenCV 3.2 and the install seems to fail try Noetic at 4.2
+#FROM ros:melodic
+FROM ros:noetic
 
-ENV ROS_DISTRO melodic
+#ENV ROS_DISTRO melodic
+ENV ROS_DISTRO noetic
 
 RUN mkdir workspace
 WORKDIR /workspace
@@ -16,7 +19,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python-rosinstall \
     python-rosinstall-generator \
     python-wstool build-essential \
-    && rm -rf /vr/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # install dependencies for orbslam3
 RUN apt-get update && apt-get install gcc g++
