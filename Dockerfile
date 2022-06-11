@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-rosinstall \
     python3-rosinstall-generator \
     python3-wstool \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # install dependencies for orbslam3
@@ -48,34 +49,34 @@ RUN apt-get update && apt-get install gcc g++
 RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
-RUN git clone --branch rich-pang --recursive https://github.com/netdrones/Pangolin.git
+#RUN git clone --branch rich-pang --recursive https://github.com/netdrones/Pangolin.git
+RUN git clone --recursive https://github.com/netdrones/Pangolin.git
 
 # instructions from Pangolin as of June 2022
 # install_prerequisites.sh -u needs a -y
-#RUN apt update -y && \
-#    ./Pangolin/scripts/install_prerequisites.sh -u && \
-#    ./Pangolin/scripts/install_prerequisites.sh recommended
+RUN ./Pangolin/scripts/install_prerequisites.sh -u && \
+    ./Pangolin/scripts/install_prerequisites.sh recommended
 
-#RUN cd Pangolin && \
-#    cmake -B build && \
-#    cmake --build build && \
-#    cmake --build build -t pypangolin_pip_install
+RUN cd Pangolin && \
+    cmake -B build && \
+    cmake --build build && \
+    cmake --build build -t pypangolin_pip_install
 
-## install Opencv
-#RUN apt-get install -y \
-#    libopencv-dev
+# install Opencv
+RUN apt-get install -y \
+    libopencv-dev
 
-## install Eigen
-#RUN apt-get install -y \
-#    libeigen3-dev
+# install Eigen
+RUN apt-get install -y \
+    libeigen3-dev
 
-## install BLAS, LAPACK
-#RUN apt-get install -y \
-#    libblas-dev \
-#    liblapack-dev
+# install BLAS, LAPACK
+RUN apt-get install -y \
+    libblas-dev \
+    liblapack-dev
 
-#RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git \
-#    cd ORB_SLAM3  && \
-#    sh ./build.sh
+RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git \
+    cd ORB_SLAM3  && \
+    sh ./build.sh
 
 CMD ["/bin/bash"]
