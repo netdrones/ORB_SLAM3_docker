@@ -62,9 +62,26 @@ RUN cd Pangolin && \
     cmake --build build && \
     cmake --build build -t pypangolin_pip_install
 
-# install Opencv
+# install Opencv only for 4.2
 RUN apt-get install -y \
     libopencv-dev
+
+# https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
+# build 4.5 from source
+RUN apt-get update && apt-get install -y \
+        cmake \
+        g++ \
+        wget \
+        unzip && \
+    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.5.0.zip && \
+    unzip opencv.zip && \
+    mkdir -p build && \
+    cd build && \
+    cmake ../opencv-4.5.0 && \
+    cmake --build . && \
+    sudo make install
+
+
 
 # install Eigen
 RUN apt-get install -y \
@@ -75,8 +92,8 @@ RUN apt-get install -y \
     libblas-dev \
     liblapack-dev
 
-RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git && \
-    cd ORB_SLAM3  && \
-    sh ./build.sh
+#RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git && \
+#    cd ORB_SLAM3  && \
+#    sh ./build.sh
 
 CMD ["/bin/bash"]
