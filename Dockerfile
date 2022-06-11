@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-# install bootstrap tools 
-# Python 3 only supported 
+# install bootstrap tools
+# Python 3 only supported
 # https://docs.ros.org/en/dashing/Guides/Using-Python-Packages.html
         #python-rosdep \
         #python-rosinstall \
@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 # install Pangolin old instructions for python 2.7 melodic
-#RUN apt-get update && apt-get install -y \ 
+#RUN apt-get update && apt-get install -y \
 #    libglew-dev \
 #    cmake \
 #    libboost-dev libboost-thread-dev libboost-filesystem-dev \
@@ -98,8 +98,10 @@ RUN apt-get install -y --no-install-recommends \
         liblapack-dev=3.9.0-1build1 \
     && rm -rf /var/lib/apt/lists/*
 
-#RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git && \
-#    cd ORB_SLAM3  && \
-#    sh ./build.sh
+WORKDIR /workspace
+RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git
+
+WORKDIR /workspace/ORB_SLAM3
+RUN    ./build.sh
 
 CMD ["/bin/bash"]
