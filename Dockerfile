@@ -43,7 +43,6 @@ RUN apt-get update && apt-get install gcc g++
     #&& cmake -DCPP11_NO_BOOST=1 .. \
     #&& make
 
-
 # tools for Pangolin
 # instructions from Pangolin as of June 2022
 RUN apt-get update && apt-get install -y \
@@ -80,8 +79,6 @@ RUN apt-get update && apt-get install -y \
     cmake ../opencv-4.5.0 && \
     cmake --build . && \
     sudo make install
-
-
 
 # install Eigen
 RUN apt-get install -y \
