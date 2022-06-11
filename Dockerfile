@@ -75,7 +75,7 @@ RUN apt-get install -y \
     libblas-dev \
     liblapack-dev
 
-RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git \
+RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git && \
     cd ORB_SLAM3  && \
     sh ./build.sh
 
