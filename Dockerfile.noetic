@@ -1,0 +1,99 @@
+# Melodic includes OpenCV 3.2 and the install seems to fail try Noetic at 4.2
+#FROM ros:melodic
+FROM ros:noetic
+
+#ENV ROS_DISTRO melodic
+ENV ROS_DISTRO noetic
+
+RUN mkdir workspace
+WORKDIR /workspace
+
+# install ros-melodic-desktop-full
+RUN apt-get update && apt-get install -y \
+    ros-${ROS_DISTRO}-desktop-full \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# install bootstrap tools 
+# Python 3 only supported 
+# https://docs.ros.org/en/dashing/Guides/Using-Python-Packages.html
+    #python-rosdep \
+    #python-rosinstall \
+    #python-rosinstall-generator \
+    #python-wstool
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    build-essential \
+    python3-rosinstall \
+    python3-rosinstall-generator \
+    python3-wstool \
+    && rm -rf /var/lib/apt/lists/*
+
+# install dependencies for orbslam3
+RUN apt-get update && apt-get install gcc g++
+
+# install Pangolin old instructions for python 2.7 melodic
+#RUN apt-get update && apt-get install -y \ 
+#    libglew-dev \
+#    cmake \
+#    libboost-dev libboost-thread-dev libboost-filesystem-dev \
+    #libpython2.7-dev
+    #&& mkdir -p Pangolin/build && \
+    #&& cd Pangolin/build \
+    #&& cmake -DCPP11_NO_BOOST=1 .. \
+    #&& make
+
+
+# tools for Pangolin
+# instructions from Pangolin as of June 2022
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+#0 18.73
+#0 18.74 Reading package lists...
+#0 18.75 Building dependency tree...
+#0 18.76 Reading state information...
+#0 18.76 Package ninja-build is not available, but is referred to by another package.
+#0 18.76 This may mean that the package is missing, has been obsoleted, or
+#0 18.76 is only available from another source
+#0 18.76
+#0 18.76 Package libegl1-mesa-dev is not available, but is referred to by another package.
+#0 18.76 This may mean that the package is missing, has been obsoleted, or
+#0 18.76 is only available from another source
+#0 18.76 However the following packages replace it:
+#0 18.76   libegl-dev
+#0 18.76
+#0 18.76 E: Unable to locate package libwayland-dev
+#0 18.76 E: Unable to locate package libxkbcommon-dev
+#0 18.76 E: Unable to locate package wayland-protocols
+#0 18.76 E: Package 'libegl1-mesa-dev' has no installation candidate
+#0 18.76 E: Unable to locate package libc++-dev
+#0 18.76 E: Package 'ninja-build' has no installation candidate
+RUN git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
+
+RUN cd Pangolin && \
+    pwd && \
+    ./scripts/install_prerequisites.sh recommended
+
+RUN cd Pangolin && \
+    cmake -B build && \
+    cmake --build build && \
+    cmake --build build -t pypangolin_pip_install
+
+# install Opencv
+RUN apt-get install -y \
+    libopencv-dev
+
+# install Eigen
+RUN apt-get install -y \
+    libeigen3-dev
+
+# install BLAS, LAPACK
+RUN apt-get install -y \
+    libblas-dev \
+    liblapack-dev
+
+RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git \
+    cd ORB_SLAM3  && \
+    sh ./build.sh
+
+CMD ["/bin/bash"]
