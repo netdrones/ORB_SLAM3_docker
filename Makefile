@@ -1,3 +1,3 @@
 
-include include.docker.mk
-include include.mk
+include lib/include.docker.mk
+include lib/include.mk
