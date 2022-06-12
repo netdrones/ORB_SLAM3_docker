@@ -2,15 +2,29 @@
 #FROM ros:melodic
 FROM ros:noetic
 
+# Use bash
+SHELL ["/bin/bash", "-c"]
+
 #ENV ROS_DISTRO melodic
 ENV ROS_DISTRO noetic
 
 RUN mkdir workspace
 WORKDIR /workspace
 
+# https://docs.docker.com/buildx/working-with-buildx/
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 # install ros-melodic-desktop-full
-RUN apt-get update && apt-get install --no-install-recommends -y \
-        ros-${ROS_DISTRO}-desktop-full=1.5.0-1focal.20220512.135058 \
+# so no way to pin with different versions
+# linux/amd64 version is 1.5.0-1focal.20220512.132246
+# linux/arm64 version is 1.5.0-1focal.20220512.135058
+# hadolint ignore=DL3008
+RUN apt-get update && \
+    VERSION="1.5.0-1focal.20220512.13$([[ $TARGETPLATFORM == "linux/arm64" ]] \
+        && echo 5058 || echo 2246)" && \
+    apt-get install --no-install-recommends -y \
+        "ros-${ROS_DISTRO}-desktop-full=$VERSION" \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -29,10 +43,20 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         python3-pip=20.0.2-5ubuntu1.6 \
     && rm -rf /var/lib/apt/lists/*
 
-# install dependencies for orbslam3
-RUN apt-get update && apt-get install --no-install-recommends -y \
-        gcc=4:9.3.0-1ubuntu2 \
-        g++=4:9.3.0-1ubuntu2 \
+# https://lindevs.com/install-gcc-on-ubuntu/
+# install dependencies for orbslam3 must be C++11 but 9 is the default
+        #gcc=4:9.3.0-1ubuntu2 \
+        #g++=4:9.3.0-1ubuntu2 \
+# arm64 0.99.9.8 software-properties-common
+# amd64 0.98.9 software-properties-common
+RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
+        && echo 0.99.9.8 || echo 0.98.9)" && \
+    apt-get update && apt-get install --no-install-recommends -y \
+        software-properties-common="$VERSION" \
+    && \
+    apt-add-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get install --no-install-recommends -y \
+       gcc-11=11.1.0-1ubuntu1~20.04 \
     && rm -rf /var/lib/apt/lists/*
 
 # install Pangolin old instructions for python 2.7 melodic
