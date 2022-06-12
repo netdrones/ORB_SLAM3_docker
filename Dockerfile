@@ -124,7 +124,7 @@ RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
     apt-add-repository -y ppa:ubuntu-toolchain-r/test && \
     apt-get install --no-install-recommends -y \
        gcc-11=11.1.0-1ubuntu1~20.04 \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/* && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
        --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
        --slave /usr/bin/gcov gcov /usr/bin/gcov-11 && \
