@@ -1,7 +1,6 @@
 #!/bin/bash
 pathDatasetTUM_VI='/Datasets/TUM_VI' #Example, it is necesary to change it by the dataset path
 
-
 # Single Session Example
 
 echo "Launching Magistrale 1 with Stereo-Inertial sensor"
