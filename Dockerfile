@@ -43,22 +43,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
         python3-pip=20.0.2-5ubuntu1.6 \
     && rm -rf /var/lib/apt/lists/*
 
-# https://lindevs.com/install-gcc-on-ubuntu/
-# install dependencies for orbslam3 must be C++11 but 9 is the default
-        #gcc=4:9.3.0-1ubuntu2 \
-        #g++=4:9.3.0-1ubuntu2 \
-# arm64 0.99.9.8 software-properties-common
-# amd64 0.98.9 software-properties-common
-RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
-        && echo 0.99.9.8 || echo 0.98.9)" && \
-    apt-get update && apt-get install --no-install-recommends -y \
-        software-properties-common="$VERSION" \
-    && \
-    apt-add-repository -y ppa:ubuntu-toolchain-r/test && \
-    apt-get install --no-install-recommends -y \
-       gcc-11=11.1.0-1ubuntu1~20.04 \
-    && rm -rf /var/lib/apt/lists/*
-
 # install Pangolin old instructions for python 2.7 melodic
 #RUN apt-get update && apt-get install -y \
 #    libglew-dev \
@@ -77,7 +61,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 #RUN git clone --branch rich-pang --recursive https://github.com/netdrones/Pangolin.git
-RUN git clone --recursive https://github.com/netdrones/Pangolin.git
+RUN git clone --recursive --branch v0.8-rich https://github.com/netdrones/Pangolin.git
 
 # instructions from Pangolin as of June 2022
 # install_prerequisites.sh -u needs a -y
@@ -95,6 +79,7 @@ RUN cmake -B build && \
 
 # https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
 # build 4.5 from source
+# use the C++11 version instead
 WORKDIR /workspace
 RUN apt-get update && apt-get install -y --no-install-recommends \
         cmake=3.16.3-1ubuntu1 \
@@ -122,8 +107,33 @@ RUN apt-get install -y --no-install-recommends \
         liblapack-dev=3.9.0-1build1 \
     && rm -rf /var/lib/apt/lists/*
 
+
+# https://lindevs.com/install-gcc-on-ubuntu/
+# install dependencies for orbslam3 must be C++11 but 9 is the default
+        #gcc=4:9.3.0-1ubuntu2 \
+        #g++=4:9.3.0-1ubuntu2 \
+# arm64 0.99.9.8 software-properties-common
+# amd64 0.98.9 software-properties-common does not work forced update
+# https://gist.github.com/yunqu/0cc6347905f73b7448898f50484e77b3
+# to set gcc-11 as the default and leave gcc-9 as backup
+RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
+        && echo 0.99.9.8 || echo 0.99.9.8)" && \
+    apt-get update && apt-get install --no-install-recommends -y \
+        software-properties-common="$VERSION" \
+    && \
+    apt-add-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get install --no-install-recommends -y \
+       gcc-11=11.1.0-1ubuntu1~20.04 \
+    && rm -rf /var/lib/apt/lists/* \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
+       --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
+       --slave /usr/bin/gcov gcov /usr/bin/gcov-11 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 50 \
+       --slave /usr/bin/g++ g++ /usr/bin/g++-9 \
+       --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+
 WORKDIR /workspace
-RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git
+RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git --branch v1.0-release
 
 WORKDIR /workspace/ORB_SLAM3
 RUN    ./build.sh
