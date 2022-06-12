@@ -116,6 +116,7 @@ RUN apt-get install -y --no-install-recommends \
 # amd64 0.98.9 software-properties-common does not work forced update
 # https://gist.github.com/yunqu/0cc6347905f73b7448898f50484e77b3
 # to set gcc-11 as the default and leave gcc-9 as backup
+# https://askubuntu.com/questions/1023/how-to-set-gcc-as-the-default-compiler-for-c-and-c-plus-plus
 RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
         && echo 0.99.9.8 || echo 0.99.9.8)" && \
     apt-get update && apt-get install --no-install-recommends -y \
@@ -124,6 +125,7 @@ RUN VERSION="$([[ $TARGETPLATFORM == "linux/arm64" ]] \
     apt-add-repository -y ppa:ubuntu-toolchain-r/test && \
     apt-get install --no-install-recommends -y \
        gcc-11=11.1.0-1ubuntu1~20.04 \
+       g++-11=11.1.0-1ubuntu1~20.04 \
     && rm -rf /var/lib/apt/lists/* && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
        --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
