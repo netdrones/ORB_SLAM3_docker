@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-c"]
 #ENV ROS_DISTRO melodic
 ENV ROS_DISTRO noetic
 
-RUN mkdir workspace
+# remember workdir will do a mkdir -p to create it.C
 WORKDIR /workspace
 
 # https://docs.docker.com/buildx/working-with-buildx/
@@ -99,8 +99,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         unzip=6.0-25ubuntu1 \
     && rm -rf /var/lib/apt/lists/* && \
     curl -L -o opencv.zip https://github.com/opencv/opencv/archive/4.5.0.zip && \
-    unzip opencv.zip && \
-    mkdir -p build
+    unzip opencv.zip
+
 WORKDIR /workspace/build
 RUN cmake ../opencv-4.5.0 && \
     cmake --build . && \
@@ -137,23 +137,27 @@ RUN VERSION="0.99.9.8" && \
        --slave /usr/bin/gcov gcov /usr/bin/gcov-9
 
 
-# brew needs a regular user
+# brew needs a regular user so here is the code to create one
 # https://hiberstack.com/questions/question/how-to-provide-sudo-permission-to-a-user-in-dockerfile/
 # Provide root privileges to this user
-RUN useradd -ms /bin/bash orb && \
-    usermod -aG sudo orb
-USER orb
-WORKDIR /home/orb
+#RUN useradd -ms /bin/bash orb && \
+#    usermod -aG sudo orb && \
+#    set the password trivial for orb to orb
+#    echo "orb:orb" | chpasswd && \
+#    add user to the sudo group
+#    usermod -aG sudo orb
 
 # install homebrew https://brew.sh
-RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
-    test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)" && \
-    test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
-    test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile && \
-    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
+#USER orb
+#WORKDIR /home/orb
+#RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
+#    test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)" && \
+#    test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
+#    test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile && \
+#    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
 
+WORKDIR /workspace
 RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git --branch v1.0-release
-WORKDIR /home/orb/ORB_SLAM3
 #RUN    ./build.sh
 
 CMD ["/bin/bash"]
