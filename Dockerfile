@@ -1,6 +1,7 @@
 # Melodic includes OpenCV 3.2 and the install seems to fail try Noetic at 4.2
 #FROM ros:melodic
 FROM ros:noetic
+LABEL maintainer="dev@netdron.es"
 
 # Use bash
 SHELL ["/bin/bash", "-c"]
