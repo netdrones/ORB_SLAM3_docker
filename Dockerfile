@@ -1,6 +1,8 @@
 # Melodic includes OpenCV 3.2 and the install seems to fail try Noetic at 4.2
 #FROM ros:melodic
 FROM ros:noetic
+# https://varhowto.com/install-ros-noetic-docker/
+FROM osrf/ros:noetic-desktop-full
 LABEL maintainer="dev@netdron.es"
 
 # Use bash
@@ -16,7 +18,7 @@ WORKDIR /workspace
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-# install ros-melodic-desktop-full
+# install ros-desktop-full
 # so no way to pin with different versions
 # linux/amd64 version is 1.5.0-1focal.20220512.132246
 # linux/arm64 version is 1.5.0-1focal.20220512.135058
@@ -36,11 +38,11 @@ RUN apt-get update && \
         #python-rosinstall-generator \
         #python-wstool
 RUN apt-get update && apt-get install --no-install-recommends -y \
-        build-essential=12.8ubuntu1.1 \
-        python3-rosinstall=0.7.8-4 \
-        python3-rosinstall-generator=0.1.22-1 \
-        python3-wstool=0.1.18-2 \
-        python3-pip=20.0.2-5ubuntu1.6 \
+        build-essential="12.8*" \
+        python3-rosinstall="0.7.8*" \
+        python3-rosinstall-generator="0.1.22*" \
+        python3-wstool="0.1.18*" \
+        python3-pip="20.0.2" \
     && rm -rf /var/lib/apt/lists/*
 
 # ORB pre-requisites: eigen, blas, lapack and opencv 4.5
